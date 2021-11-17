@@ -830,7 +830,7 @@ let
         mktplcRef = {
           name = "Go";
           publisher = "golang";
-          version = "0.25.1";
+          version = "0.29.0";
           sha256 = "sha256-ZDUWN9lzDnR77W7xcMFQaaFl/6Lf/x1jgaBkwZPqGGw=";
         };
         meta = {
