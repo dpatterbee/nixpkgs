@@ -7,7 +7,6 @@
 , lld
 , avrgcc
 , go
-, gcc-arm-embedded
 , avrdude
 , openocd
 }:
@@ -40,7 +39,6 @@ in buildGoModule rec {
   allowGoReference = true;
 
   postPatch = ''
-    patchShebangs lib/wasi-libc
     sed -i s/', "-nostdlibinc"'// builder/builtins.go
     sed -i s/'"-nostdlibinc", '// compileopts/config.go builder/picolibc.go
   '';
@@ -51,7 +49,8 @@ in buildGoModule rec {
 
   postInstall = ''
     mkdir -p $out/share/tinygo $out/libexec/tinygo
-    cp -a lib src targets $out/share/tinygo
+    make build/release
+    cp -a build/release/tinygo/lib src targets $out/share/tinygo
 
     ln -s ${lib.getBin clang-unwrapped}/bin/clang $out/libexec/tinygo/clang-${llvmMajor}
     ln -s ${lib.getBin lld}/bin/ld.lld $out/libexec/tinygo/ld.lld-${llvmMajor}
@@ -60,9 +59,9 @@ in buildGoModule rec {
 
   postFixup = ''
     wrapProgram $out/bin/tinygo \
-      --prefix PATH : ${lib.makeBinPath [ avrgcc avrdude openocd gcc-arm-embedded ]}:$out/libexec/tinygo \
+      --prefix PATH : ${lib.makeBinPath [ avrgcc avrdude openocd ]}:$out/libexec/tinygo \
       --prefix TINYGOROOT : $out/share/tinygo \
-      --prefix GOROOT : ${go.outPath}/share/go
+      --prefix GOROOT : ${go}/share/go
   '';
 
   meta = with lib; {
